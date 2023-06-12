@@ -26,7 +26,7 @@ s = read_txt(file_path)
 # # print(a[0].text.replace('\n', ''))
 # for i in a:
 #     print(i.text.replace('\n', ''))
-#     print('-------') 
+#     print('-------')  
 
 
 for i in kss.split_sentences(s, backend = 'auto'):
