@@ -14,21 +14,51 @@ def read_txt(file_path):
 
     return contents
 
-file_path = "./sentence.txt"  # 읽고자 하는 파일의 경로와 이름을 지정합니다.
 
-s = read_txt(file_path)
-# print(s)
+if __name__ == '__main__':
 
-# kiwi = Kiwi()
+    # file_path = "./sentence.txt"  # 읽고자 하는 파일의 경로와 이름을 지정합니다.
+    file_path = "./sentence(refined).txt"
 
-# a = kiwi.split_into_sents(s)
-# print(a)
-# # print(a[0].text.replace('\n', ''))
-# for i in a:
-#     print(i.text.replace('\n', ''))
-#     print('-------')  
+    text = read_txt(file_path)
+    print(text)
+    print("----------\n")
 
+    # kiwi
+    print("kiwi\n")
 
-for i in kss.split_sentences(s, backend = 'auto'):
-    print(i.replace('\n', ''))
-    print('-----------')
+    kiwi = Kiwi()
+    kiwi_res = kiwi.split_into_sents(text)
+    print(kiwi_res, "\n")
+
+    for sent in kiwi_res:
+        print(repr(sent.text))
+    print("----------\n")
+
+    # kss mecab
+    print("kss mecab\n")
+    kss_res = kss.split_sentences(text, backend='mecab')
+    print(kss_res, "\n")
+
+    for sent in kss_res:
+        print(repr(sent))
+    print("----------\n")
+
+    # kss pecab
+    print("kss pecab\n")
+    kss_res = kss.split_sentences(text, backend='pecab')
+    print(kss_res, "\n")
+
+    for sent in kss_res:
+        print(repr(sent))
+    print("----------\n")
+
+    # kss puncturation
+    print("kss puncturation\n")
+    kss_res = kss.split_sentences(text, backend='punct')
+    print(kss_res, "\n")
+
+    for sent in kss_res:
+        print(repr(sent))
+    print("----------\n")
+
