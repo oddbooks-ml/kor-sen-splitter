@@ -14,6 +14,7 @@ def read_txt(file_path):
 
     return contents
 
+
 # 쓸지 말지 고민 중
 def split_kiwi():
     kiwi = Kiwi()
