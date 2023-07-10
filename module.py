@@ -1,3 +1,6 @@
+import kss
+
+
 def read_txt(file_path):
     try:
         with open(file_path, 'r') as file:
@@ -13,36 +16,56 @@ def read_txt(file_path):
 
 def union_qmark(text: str) -> str:
     # 여러 종류의 큰 따옴표를 ascii code 값이 34인 " 따옴표로 변환
-    targets = ['“', '”']
+    # 여러 종류의 작은 따옴표를 ascii code 값이 39인 ' 따옴표로 변환
+    targets = '“”'
     for t in targets:
         text = text.replace(t, '"')
+
+    targets = "‘’"
+    for t in targets:
+        text = text.replace(t, "'")
+
     return text
 
 
-def split_line(text: str, conn_line: dict[str, str] = None) -> tuple[bool, list]:
+def split_lines(text: str) -> list:
     # input
     # - text(str): 책 한 페이지 글
-    # - conn_line(dict): 이전 페이지에서 대사가 미완결된 경우 마지막 대사 데이터
     # output
-    # - (bool) 마지막에 대사가 완결되었는지 여부. True: 완결 / False: 미완결
-    # - (list) 나레이션/대사 분리 데이터. [{'type': 'line' 또는 'narration', 'content': 분리된 글}]
-    
-    lines = text.split('"')
-    res = []
-    if conn_line:
-        lines.reverse()
-        conn_line['content'] += lines.pop()
-        res.append(conn_line)
-        lines.reverse()
-    
-    for i, line in enumerate(lines):
-        line = line.strip()
-        if len(line) == 0:
-            continue
+    # - (list) 나레이션/대사 분리 데이터. [{'type': 'narration'|'dialogue'|'monologue', 'text': 분리된 글}]
 
-        if i % 2 == 0:
-            res.append({'type': 'narration', 'content': line})
+    def strip_line():
+        lines[-1]['text'] = lines[-1]['text'].strip()
+        if len(lines[-1]['text']) == 0:
+            lines.pop()
+
+    lines = [{'type': None, 'text': ""}]
+
+    for c in text:
+        ltype = {'"': 'dialogue', "'": 'monologue'}.get(c, 'narration')
+
+        if lines[-1]['type'] == 'narration' != ltype:
+            strip_line()
+            lines.append({'type': ltype, 'text': ""})
+        elif lines[-1]['type'] == ltype != 'narration':
+            strip_line()
+            lines.append({'type': None, 'text': ""})
+        elif lines[-1]['type'] is None:
+            lines[-1]['type'] = ltype
+            lines[-1]['text'] += c
         else:
-            res.append({'type': 'line', 'content': line})
+            lines[-1]['text'] += c
 
-    return i % 2 == 0, res
+    strip_line()
+    return lines
+
+
+def split_sentences(text):
+    sents = []
+    
+    for line in split_lines(text):
+        txt = line['text'].replace("\n", "")
+        for sent in kss.split_sentences(txt, backend='auto'):
+            sents.append({'type': line['type'], 'text': sent})
+    
+    return sents
