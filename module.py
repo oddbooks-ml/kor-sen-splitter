@@ -34,29 +34,51 @@ def split_lines(text: str) -> list:
     # output
     # - (list) 나레이션/대사 분리 데이터. [{'type': 'narration'|'dialogue'|'monologue', 'text': 분리된 글}]
 
-    def strip_line():
-        lines[-1]['text'] = lines[-1]['text'].strip()
-        if len(lines[-1]['text']) == 0:
-            lines.pop()
+    q_map = {'"': ('"', 'dialogue'), "“": ("”", 'dialogue'), "'": ("'", 'monologue'), "‘": ("’", 'monologue')}
+    end_c = [".", ",", "?", "!", "…", "―", "-", "~", ";"]
 
-    lines = [{'type': None, 'text': ""}]
+    lines = []
+    n_line = ""
+    q_line = ""
+    q = None
+    end_flag = False
 
     for c in text:
-        ltype = {'"': 'dialogue', "'": 'monologue'}.get(c, 'narration')
+        if q is None:  # 따옴표 밖
+            if c in q_map:  # 새로운 문자가 따옴표인 경우
+                q = c
 
-        if lines[-1]['type'] == 'narration' != ltype:
-            strip_line()
-            lines.append({'type': ltype, 'text': ""})
-        elif lines[-1]['type'] == ltype != 'narration':
-            strip_line()
-            lines.append({'type': None, 'text': ""})
-        elif lines[-1]['type'] is None:
-            lines[-1]['type'] = ltype
-            lines[-1]['text'] += c
-        else:
-            lines[-1]['text'] += c
+            else:  # 따옴표가 아닌 경우
+                n_line += c
+                
+        else:  # 따옴표 안
+            if c == q_map[q][0]:  # 새로운 문자가 닫는 따옴표인 경우
+                if end_flag:  # 직전 문자가 끝부호인 경우
+                    n_line = n_line.strip()
+                    q_line = q_line.strip()
 
-    strip_line()
+                    if n_line:
+                        lines.append({'type': 'narration', 'text': n_line})
+                        n_line = ""
+                    if q_line:
+                        lines.append({'type': q_map[q][1], 'text': q_line})
+
+                else:  # 끝부호가 아닌 경우
+                    n_line += q + q_line + c
+
+                q_line = ""
+                q = None
+
+            else:  # 닫는 따옴표가 아닌 경우
+                q_line += c
+
+        end_flag = c in end_c
+    
+    n_line = n_line.strip()
+
+    if n_line:
+        lines.append({'type': 'narration', 'text': n_line})
+
     return lines
 
 
