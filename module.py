@@ -1,3 +1,6 @@
+import kss
+
+
 def read_txt(file_path):
     try:
         with open(file_path, 'r') as file:
@@ -13,36 +16,78 @@ def read_txt(file_path):
 
 def union_qmark(text: str) -> str:
     # 여러 종류의 큰 따옴표를 ascii code 값이 34인 " 따옴표로 변환
-    targets = ['“', '”']
+    # 여러 종류의 작은 따옴표를 ascii code 값이 39인 ' 따옴표로 변환
+    targets = '“”'
     for t in targets:
         text = text.replace(t, '"')
+
+    targets = "‘’"
+    for t in targets:
+        text = text.replace(t, "'")
+
     return text
 
 
-def split_line(text: str, conn_line: dict[str, str] = None) -> tuple[bool, list]:
+def split_lines(text: str) -> list:
     # input
     # - text(str): 책 한 페이지 글
-    # - conn_line(dict): 이전 페이지에서 대사가 미완결된 경우 마지막 대사 데이터
     # output
-    # - (bool) 마지막에 대사가 완결되었는지 여부. True: 완결 / False: 미완결
-    # - (list) 나레이션/대사 분리 데이터. [{'type': 'line' 또는 'narration', 'content': 분리된 글}]
-    
-    lines = text.split('"')
-    res = []
-    if conn_line:
-        lines.reverse()
-        conn_line['content'] += lines.pop()
-        res.append(conn_line)
-        lines.reverse()
-    
-    for i, line in enumerate(lines):
-        line = line.strip()
-        if len(line) == 0:
-            continue
+    # - (list) 나레이션/대사 분리 데이터. [{'type': 'narration'|'dialogue'|'monologue', 'text': 분리된 글}]
 
-        if i % 2 == 0:
-            res.append({'type': 'narration', 'content': line})
-        else:
-            res.append({'type': 'line', 'content': line})
+    q_map = {'"': ('"', 'dialogue'), "“": ("”", 'dialogue'), "'": ("'", 'monologue'), "‘": ("’", 'monologue')}
+    end_c = [".", ",", "?", "!", "…", "―", "-", "~", ";"]
 
-    return i % 2 == 0, res
+    lines = []
+    n_line = ""
+    q_line = ""
+    q = None
+    end_flag = False
+
+    for c in text:
+        if q is None:  # 따옴표 밖
+            if c in q_map:  # 새로운 문자가 따옴표인 경우
+                q = c
+
+            else:  # 따옴표가 아닌 경우
+                n_line += c
+                
+        else:  # 따옴표 안
+            if c == q_map[q][0]:  # 새로운 문자가 닫는 따옴표인 경우
+                if end_flag:  # 직전 문자가 끝부호인 경우
+                    n_line = n_line.strip()
+                    q_line = q_line.strip()
+
+                    if n_line:
+                        lines.append({'type': 'narration', 'text': n_line})
+                        n_line = ""
+                    if q_line:
+                        lines.append({'type': q_map[q][1], 'text': q_line})
+
+                else:  # 끝부호가 아닌 경우
+                    n_line += q + q_line + c
+
+                q_line = ""
+                q = None
+
+            else:  # 닫는 따옴표가 아닌 경우
+                q_line += c
+
+        end_flag = c in end_c
+    
+    n_line = n_line.strip()
+
+    if n_line:
+        lines.append({'type': 'narration', 'text': n_line})
+
+    return lines
+
+
+def split_sentences(text):
+    sents = []
+    
+    for line in split_lines(text):
+        txt = line['text'].replace("\n", "")
+        for sent in kss.split_sentences(txt, backend='auto'):
+            sents.append({'type': line['type'], 'text': sent})
+    
+    return sents
