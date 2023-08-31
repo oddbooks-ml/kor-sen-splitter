@@ -8,5 +8,5 @@ setup(
     author="jinoan",
     author_email="jinoan89@gmail.com",
     packages=["kor_sen_splitter"],
-    install_requires=["kss"]
+    install_requires=["kss", "kiwipiepy"]
 )
