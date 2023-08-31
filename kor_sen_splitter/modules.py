@@ -89,7 +89,7 @@ def split_sentences(text, mode='kss'):
     sents = []
     
     for line in split_lines(text):
-        txt = line['text'].replace("\n", "")
+        txt = line['text'].replace("\n", " ")
 
         if mode == 'kiwi':
             for sent in kiwi.split_into_sents(txt):
