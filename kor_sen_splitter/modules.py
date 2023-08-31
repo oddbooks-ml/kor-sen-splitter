@@ -85,7 +85,7 @@ def split_lines(text: str) -> list:
     return lines
 
 
-def split_sentences(text, mode='kiwi'):
+def split_sentences(text, mode='kss'):
     sents = []
     
     for line in split_lines(text):
