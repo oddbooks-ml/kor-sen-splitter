@@ -31,9 +31,11 @@ def union_qmark(text: str) -> str:
     return text
 
 
-def split_lines(text: str) -> list:
+def split_lines(text: str, q_map: dict = None, end_c: list = None) -> list:
     # input
     # - text(str): 책 한 페이지 글
+    # - q_map(dict): 따옴표 종류. {'시작 따옴표'(str): ('끝 따옴표'(str), '따옴표 종류'(str))}
+    # - end_c(list): 대사 마침 기호. ['기호1'(str), '기호2'(str), ...]
     # output
     # - (list) 나레이션/대사 분리 데이터. [{'type': 'narration'|'dialogue'|'monologue', 'text': 분리된 글}]
 
