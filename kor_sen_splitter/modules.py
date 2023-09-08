@@ -41,7 +41,7 @@ def split_lines(text: str, q_map: dict = None, end_c: list = None) -> list:
 
     if q_map is None:
         q_map = {'"': ('"', 'dialogue'), "“": ("”", 'dialogue'), "'": ("'", 'monologue'), "‘": ("’", 'monologue')}
-        
+
     if end_c is None:
         end_c = [".", ",", "?", "!", "…", "―", "-", "~", ";"]
 
@@ -90,10 +90,10 @@ def split_lines(text: str, q_map: dict = None, end_c: list = None) -> list:
     return lines
 
 
-def split_sentences(text, mode='kss'):
+def split_sentences(text, q_map=None, end_c=None, mode='kss'):
     sents = []
     
-    for line in split_lines(text):
+    for line in split_lines(text, q_map, end_c):
         txt = line['text'].replace("\n", " ")
 
         if mode == 'kiwi':
