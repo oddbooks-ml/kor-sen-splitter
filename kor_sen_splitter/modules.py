@@ -39,8 +39,11 @@ def split_lines(text: str, q_map: dict = None, end_c: list = None) -> list:
     # output
     # - (list) 나레이션/대사 분리 데이터. [{'type': 'narration'|'dialogue'|'monologue', 'text': 분리된 글}]
 
-    q_map = {'"': ('"', 'dialogue'), "“": ("”", 'dialogue'), "'": ("'", 'monologue'), "‘": ("’", 'monologue')}
-    end_c = [".", ",", "?", "!", "…", "―", "-", "~", ";"]
+    if q_map is None:
+        q_map = {'"': ('"', 'dialogue'), "“": ("”", 'dialogue'), "'": ("'", 'monologue'), "‘": ("’", 'monologue')}
+        
+    if end_c is None:
+        end_c = [".", ",", "?", "!", "…", "―", "-", "~", ";"]
 
     lines = []
     n_line = ""
