@@ -1,3 +1,4 @@
+import re
 import kss
 from kiwipiepy import Kiwi
 
@@ -105,3 +106,18 @@ def split_sentences(text, q_map=None, end_c=None, mode='kss'):
                 sents.append({'type': line['type'], 'text': sent})
     
     return sents
+
+
+def split_paragraphs(text, q_map=None, end_c=None):
+    prgs = []
+    for line in split_lines(text, q_map, end_c):
+        txt = re.sub('\n+', '\n', line['text'])
+
+        if line['type'] == 'narration':
+            for p in txt.split('\n'):
+                prgs.append({'type': 'narration', 'text': p})
+
+        else:
+            prgs.append(line)
+
+    return prgs
