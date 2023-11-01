@@ -1,8 +1,8 @@
 import re
-import kss
-from kiwipiepy import Kiwi
+# import kss
+# from kiwipiepy import Kiwi
 
-kiwi = Kiwi()
+# kiwi = Kiwi()
 
 
 def read_txt(file_path):
@@ -91,21 +91,21 @@ def split_lines(text: str, q_map: dict = None, end_c: list = None) -> list:
     return lines
 
 
-def split_sentences(text, q_map=None, end_c=None, mode='kss'):
-    sents = []
+# def split_sentences(text, q_map=None, end_c=None, mode='kss'):
+#     sents = []
     
-    for line in split_lines(text, q_map, end_c):
-        txt = line['text'].replace("\n", " ")
+#     for line in split_lines(text, q_map, end_c):
+#         txt = line['text'].replace("\n", " ")
 
-        if mode == 'kiwi':
-            for sent in kiwi.split_into_sents(txt):
-                sents.append({'type': line['type'], 'text': sent.text})
+#         if mode == 'kiwi':
+#             for sent in kiwi.split_into_sents(txt):
+#                 sents.append({'type': line['type'], 'text': sent.text})
 
-        elif mode == 'kss':
-            for sent in kss.split_sentences(txt, backend='auto'):
-                sents.append({'type': line['type'], 'text': sent})
+#         elif mode == 'kss':
+#             for sent in kss.split_sentences(txt, backend='auto'):
+#                 sents.append({'type': line['type'], 'text': sent})
     
-    return sents
+#     return sents
 
 
 def split_paragraphs(text, q_map=None, end_c=None):
