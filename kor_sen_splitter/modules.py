@@ -1,8 +1,8 @@
 import re
 import kss
-# from kiwipiepy import Kiwi
+from kiwipiepy import Kiwi
 
-# kiwi = Kiwi()
+kiwi = Kiwi()
 
 
 def read_txt(file_path):
@@ -56,11 +56,13 @@ def split_lines(text: str, q_map: dict = None, end_c: list = None) -> list:
         if q is None:  # 따옴표 밖
             if c in q_map:  # 새로운 문자가 따옴표인 경우
                 q = c
+                q_line += c
 
             else:  # 따옴표가 아닌 경우
                 n_line += c
                 
         else:  # 따옴표 안
+            q_line += c
             if c == q_map[q][0]:  # 새로운 문자가 닫는 따옴표인 경우
                 if end_flag:  # 직전 문자가 끝부호인 경우
                     n_line = n_line.strip()
@@ -73,13 +75,10 @@ def split_lines(text: str, q_map: dict = None, end_c: list = None) -> list:
                         lines.append({'type': q_map[q][1], 'text': q_line})
 
                 else:  # 끝부호가 아닌 경우
-                    n_line += q + q_line + c
+                    n_line += q_line
 
                 q_line = ""
                 q = None
-
-            else:  # 닫는 따옴표가 아닌 경우
-                q_line += c
 
         end_flag = c in end_c
     
@@ -91,19 +90,19 @@ def split_lines(text: str, q_map: dict = None, end_c: list = None) -> list:
     return lines
 
 
-def split_sentences(text, q_map=None, end_c=None):  # , mode='kss'):
+def split_sentences(text, q_map=None, end_c=None, mode='kss'):
     sents = []
     
     for line in split_lines(text, q_map, end_c):
         txt = line['text'].replace("\n", " ")
 
-        # if mode == 'kiwi':
-        #     for sent in kiwi.split_into_sents(txt):
-        #         sents.append({'type': line['type'], 'text': sent.text})
+        if mode == 'kiwi':
+            for sent in kiwi.split_into_sents(txt):
+                sents.append({'type': line['type'], 'text': sent.text})
 
-        # elif mode == 'kss':
-        for sent in kss.split_sentences(txt, backend='auto'):
-            sents.append({'type': line['type'], 'text': sent})
+        elif mode == 'kss':
+            for sent in kss.split_sentences(txt, backend='auto'):
+                sents.append({'type': line['type'], 'text': sent})
     
     return sents
 
