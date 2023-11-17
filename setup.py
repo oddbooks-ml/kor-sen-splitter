@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(
-    name='kor_sen_splitter',
+    name='kor-sen-splitter',
     version='0.0.3',
     description="한국어 문장 분리기",
     url="https://github.com/oddbooks-ml/kor_sen_splitter.git",
