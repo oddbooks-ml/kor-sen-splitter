@@ -32,7 +32,7 @@ def union_qmark(text: str) -> str:
     return text
 
 
-def split_lines(text: str, q_map: dict = None, end_c: list = None) -> list:
+def split_logues(text: str, q_map: dict = None, end_c: list = None) -> list:
     # input
     # - text(str): 책 한 페이지 글
     # - q_map(dict): 따옴표 종류. {'시작 따옴표'(str): ('끝 따옴표'(str), '따옴표 종류'(str))}
@@ -46,9 +46,9 @@ def split_lines(text: str, q_map: dict = None, end_c: list = None) -> list:
     if end_c is None:
         end_c = [".", ",", "?", "!", "…", "―", "-", "~", ";"]
 
-    lines = []
-    n_line = ""
-    q_line = ""
+    logues = []
+    n_logue = ""
+    q_logue = ""
     q = None
     end_flag = False
 
@@ -56,63 +56,63 @@ def split_lines(text: str, q_map: dict = None, end_c: list = None) -> list:
         if q is None:  # 따옴표 밖
             if c in q_map:  # 새로운 문자가 따옴표인 경우
                 q = c
-                q_line += c
+                q_logue += c
 
             else:  # 따옴표가 아닌 경우
-                n_line += c
+                n_logue += c
                 
         else:  # 따옴표 안
-            q_line += c
+            q_logue += c
             if c == q_map[q][0]:  # 새로운 문자가 닫는 따옴표인 경우
                 if end_flag:  # 직전 문자가 끝부호인 경우
-                    n_line = n_line.strip()
-                    q_line = q_line.strip()
+                    n_logue = n_logue.strip()
+                    q_logue = q_logue.strip()
 
-                    if n_line:
-                        lines.append({'type': 'narration', 'text': n_line})
-                        n_line = ""
-                    if q_line:
-                        lines.append({'type': q_map[q][1], 'text': q_line})
+                    if n_logue:
+                        logues.append({'type': 'narration', 'text': n_logue})
+                        n_logue = ""
+                    if q_logue:
+                        logues.append({'type': q_map[q][1], 'text': q_logue})
 
                 else:  # 끝부호가 아닌 경우
-                    n_line += q_line
+                    n_logue += q_logue
 
-                q_line = ""
+                q_logue = ""
                 q = None
 
         end_flag = c in end_c
     
-    n_line = n_line.strip()
+    n_logue = n_logue.strip()
 
-    if n_line:
-        lines.append({'type': 'narration', 'text': n_line})
+    if n_logue:
+        logues.append({'type': 'narration', 'text': n_logue})
 
-    return lines
+    return logues
 
 
-def split_sentences(text, q_map=None, end_c=None, mode='kss'):
+def split_sentences(text, split_fn=split_logues, q_map=None, end_c=None, mode='kss'):
     sents = []
     
-    for line in split_lines(text, q_map, end_c):
-        txt = line['text'].replace("\n", " ")
+    for p in split_fn(text, q_map=q_map, end_c=end_c):
+        txt = p['text'].replace("\n", " ")
 
         if mode == 'kiwi':
             for sent in kiwi.split_into_sents(txt):
-                sents.append({'type': line['type'], 'text': sent.text})
+                sents.append({'type': p['type'], 'text': sent.text})
 
         elif mode == 'kss':
             for sent in kss.split_sentences(txt, backend='auto'):
-                sents.append({'type': line['type'], 'text': sent})
+                sents.append({'type': p['type'], 'text': sent})
     
     return sents
 
 
-def split_paragraphs(text, q_map=None, end_c=None):
-    prgs = []
-    for line in split_lines(text, q_map, end_c):
-        txt = re.sub('\n+', '\n', line['text'])
+def split_lines(text, split_fn=split_logues, q_map=None, end_c=None):
+    lines = []
+    for p in split_fn(text, q_map=q_map, end_c=end_c):
+        txt = re.sub('\n+', '\n', p['text'])
 
-        for p in txt.split('\n'):
-            prgs.append({'type': line['type'], 'text': p})
+        for line in txt.split('\n'):
+            lines.append({'type': p['type'], 'text': line})
 
-    return prgs
+    return lines
