@@ -112,11 +112,7 @@ def split_paragraphs(text, q_map=None, end_c=None):
     for line in split_lines(text, q_map, end_c):
         txt = re.sub('\n+', '\n', line['text'])
 
-        if line['type'] == 'narration':
-            for p in txt.split('\n'):
-                prgs.append({'type': 'narration', 'text': p})
-
-        else:
-            prgs.append(line)
+        for p in txt.split('\n'):
+            prgs.append({'type': line['type'], 'text': p})
 
     return prgs
